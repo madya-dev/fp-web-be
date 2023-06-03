@@ -2,9 +2,9 @@ package main
 
 import (
 	_ "github.com/joho/godotenv/autoload"
-	"hrd-be/pkg/database"
+	"hrd-be/db"
 )
 
 func main() {
-	database.Connection()
+	db.InitialMigrate()
 }
