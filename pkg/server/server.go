@@ -10,8 +10,8 @@ func StartServer() {
 	log.Print("INFO StartServer: server is starting")
 	router := gin.Default()
 
-	public := router.Group("/")
-	routes.PublicRoutes(public)
+	account := router.Group("/account")
+	routes.AccountRoutes(account)
 
 	err := router.Run(":8080")
 	if err != nil {

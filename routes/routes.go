@@ -1,7 +1,10 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"hrd-be/internal/account/controller"
+)
 
-func PublicRoutes(g *gin.RouterGroup) {
-
+func AccountRoutes(g *gin.RouterGroup) {
+	g.POST("/login", controller.LoginHandler())
 }
