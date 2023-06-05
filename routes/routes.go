@@ -7,4 +7,5 @@ import (
 
 func AccountRoutes(g *gin.RouterGroup) {
 	g.POST("/login", controller.LoginHandler())
+	g.POST("/create", controller.CreateAccountHandler())
 }

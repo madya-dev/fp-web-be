@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"hrd-be/internal/account/dto"
-	"hrd-be/internal/global/auth"
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/model"
 	"hrd-be/pkg/database"
+	"hrd-be/pkg/jwt"
 	inputValidator "hrd-be/pkg/validator"
 	"os"
 )
@@ -50,10 +50,16 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 
-		jwtString := auth.CreateToken(account.Username, account.Role)
+		jwtString := jwt.CreateToken(account.Username, account.Role)
 		response.DefaultOK()
 		response.Message = "login success"
 		c.Header("Authorization", jwtString)
 		c.JSON(response.Code, response)
+	}
+}
+
+func CreateAccountHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
 	}
 }
