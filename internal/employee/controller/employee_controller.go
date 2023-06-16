@@ -112,6 +112,7 @@ func EditEmployeeHandler() gin.HandlerFunc {
 		var editInput dto.EditInput
 		if err := c.BindJSON(&editInput); err != nil {
 			response.DefaultInternalError()
+			response.Data = map[string]string{"errors": err.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
@@ -143,6 +144,7 @@ func EditEmployeeHandler() gin.HandlerFunc {
 		result := db.Save(&employee)
 		if result.Error != nil {
 			response.DefaultInternalError()
+			response.Data = map[string]string{"errors": result.Error.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}

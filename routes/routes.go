@@ -5,6 +5,7 @@ import (
 	accountController "hrd-be/internal/account/controller"
 	cisController "hrd-be/internal/cis/controller"
 	employeeController "hrd-be/internal/employee/controller"
+	projectController "hrd-be/internal/project/controller"
 )
 
 func AccountRoutes(g *gin.RouterGroup) {
@@ -26,4 +27,8 @@ func EmployeeRoutes(g *gin.RouterGroup) {
 	g.GET("/", employeeController.GetAllEmployeeHandler())
 	g.GET("/:employee_id", employeeController.GetEmployeeDetail())
 	g.PUT("/:employee_id", employeeController.EditEmployeeHandler())
+}
+
+func ProjectRoutes(g *gin.RouterGroup) {
+	g.POST("/new", projectController.NewProjectHandler())
 }
