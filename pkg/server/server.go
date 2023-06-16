@@ -24,6 +24,9 @@ func StartServer() {
 	project := router.Group("/project")
 	routes.ProjectRoutes(project)
 
+	slip := router.Group("/slip")
+	routes.SlipRoutes(slip)
+
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatalf("ERROR StartServer fatal error: %v", err)

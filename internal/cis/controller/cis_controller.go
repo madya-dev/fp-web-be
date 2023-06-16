@@ -28,6 +28,9 @@ func NewCisHandler() gin.HandlerFunc {
 		}
 
 		validationErrors := inputValidator.RequestBodyValidator(newInput)
+		if newInput.Type == 3 && newInput.File == nil {
+			validationErrors = append(validationErrors, "Sakit must attach sick letter")
+		}
 		if validationErrors != nil {
 			response.DefaultBadRequest()
 			response.Data = map[string][]string{"errors": validationErrors}
@@ -35,20 +38,24 @@ func NewCisHandler() gin.HandlerFunc {
 			return
 		}
 
-		filename := uuid.New().String()
-		ext := filepath.Ext(newInput.File.Filename)
-		allowedTypes := []string{".jpeg", ".jpg", ".png", ".pdf", ".webp"}
-		status := false
-		for _, allowedType := range allowedTypes {
-			if ext == allowedType {
-				status = true
-				break
+		filename := ""
+		ext := ""
+		if newInput.File != nil {
+			filename = uuid.New().String()
+			ext = filepath.Ext(newInput.File.Filename)
+			allowedTypes := []string{".jpeg", ".jpg", ".png", ".pdf", ".webp"}
+			status := false
+			for _, allowedType := range allowedTypes {
+				if ext == allowedType {
+					status = true
+					break
+				}
 			}
-		}
-		if !status {
-			response.DefaultBadRequest()
-			response.Data = map[string]string{"errors": "file input type not allowed"}
-			c.AbortWithStatusJSON(response.Code, response)
+			if !status {
+				response.DefaultBadRequest()
+				response.Data = map[string]string{"errors": "file input type not allowed"}
+				c.AbortWithStatusJSON(response.Code, response)
+			}
 		}
 
 		db := database.Connection()
@@ -56,8 +63,10 @@ func NewCisHandler() gin.HandlerFunc {
 		endDate, _ := time.Parse("2006-01-02", newInput.EndDate)
 
 		err := db.Transaction(func(tx *gorm.DB) error {
-			if err := c.SaveUploadedFile(newInput.File, filepath.Join("files", filename+ext)); err != nil {
-				return errors.New("failed upload file")
+			if newInput.File != nil {
+				if err := c.SaveUploadedFile(newInput.File, filepath.Join("files", filename+ext)); err != nil {
+					return errors.New("failed upload file")
+				}
 			}
 
 			cisDetail := model.CisDetail{

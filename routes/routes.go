@@ -6,6 +6,7 @@ import (
 	cisController "hrd-be/internal/cis/controller"
 	employeeController "hrd-be/internal/employee/controller"
 	projectController "hrd-be/internal/project/controller"
+	slipController "hrd-be/internal/slip/controller"
 )
 
 func AccountRoutes(g *gin.RouterGroup) {
@@ -35,4 +36,8 @@ func ProjectRoutes(g *gin.RouterGroup) {
 	g.GET("/:project_id", projectController.GetProjectDetailHandler())
 	g.PUT("/:project_id", projectController.EditProjectHandler())
 	g.DELETE("/:project_id", projectController.DeleteProjectHandler())
+}
+
+func SlipRoutes(g *gin.RouterGroup) {
+	g.POST("/generate", slipController.GenerateSlipHandler())
 }
