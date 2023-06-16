@@ -14,6 +14,19 @@ func (r *Response) DefaultOK() {
 	r.Data = nil
 }
 
+func (r *Response) DefaultCreated() {
+	r.Status = true
+	r.Code = 201
+	r.Message = "data created"
+	r.Data = nil
+}
+
+func (r *Response) DefaultBadRequest() {
+	r.Status = false
+	r.Code = 400
+	r.Message = "input not valid"
+	r.Data = nil
+}
 func (r *Response) DefaultUnauthorized() {
 	r.Status = false
 	r.Code = 401
@@ -28,10 +41,10 @@ func (r *Response) DefaultNotFound() {
 	r.Data = nil
 }
 
-func (r *Response) DefaultNotAcceptable() {
+func (r *Response) DefaultConflict() {
 	r.Status = false
-	r.Code = 406
-	r.Message = "input not valid"
+	r.Code = 409
+	r.Message = "input data conflict"
 	r.Data = nil
 }
 

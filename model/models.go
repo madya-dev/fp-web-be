@@ -1,10 +1,11 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"hrd-be/pkg/database"
 	"log"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type SalaryCut struct {
@@ -75,9 +76,9 @@ type Employee struct {
 }
 
 type Account struct {
-	ID         int `gorm:"primaryKey;autoIncrement"`
-	Username   string
-	Email      string
+	ID         int    `gorm:"primaryKey;autoIncrement"`
+	Username   string `gorm:"unique"`
+	Email      string `gorm:"unique"`
 	Password   string
 	Role       int
 	EmployeeID int
