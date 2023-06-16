@@ -185,3 +185,65 @@ func GetProjectDetailHandler() gin.HandlerFunc {
 		c.JSON(response.Code, response)
 	}
 }
+
+func EditProjectHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		projectId := c.Param("project_id")
+		var editProjectInput dto.NewProjectInput
+		if err := c.BindJSON(&editProjectInput); err != nil {
+			response.DefaultInternalError()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		validationErrors := inputValidator.RequestBodyValidator(editProjectInput)
+		if validationErrors != nil {
+			response.DefaultBadRequest()
+			response.Data = map[string][]string{"errors": validationErrors}
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		startDate, _ := time.Parse("2006-01-02", editProjectInput.StartDate)
+		endDate, _ := time.Parse("2006-01-02", editProjectInput.EndDate)
+
+		db := database.Connection()
+		var employees []model.Employee
+		for _, each := range editProjectInput.EmployeesID {
+			var employee model.Employee
+			db.Where("id = ?", each).First(&employee)
+			employees = append(employees, employee)
+		}
+
+		var project model.Project
+		var count int64
+		result := db.Where("id = ?", projectId).Find(&project)
+		if result.Count(&count); count != 1 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		project.Name = editProjectInput.Name
+		project.Client = editProjectInput.Client
+		project.Budget = editProjectInput.Budget
+		project.StartDate = startDate
+		project.EndDate = endDate
+
+		_ = db.Model(&project).Association("Employees").Clear()
+		project.Employees = employees
+
+		result = db.Save(&project)
+		if result.Error != nil {
+			response.DefaultInternalError()
+			response.Data = map[string]string{"errors": result.Error.Error()}
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		response.DefaultOK()
+		response.Message = "project detail updated successfully"
+		c.JSON(response.Code, response)
+	}
+}
