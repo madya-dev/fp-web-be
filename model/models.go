@@ -15,21 +15,21 @@ type SalaryCut struct {
 }
 
 type SalarySlip struct {
-	ID           int `gorm:"primaryKey;autoIncrement"`
-	Name         string
-	Position     string
-	Status       string
-	StartPeriode time.Time `gorm:"type:date"`
-	EndPeriode   time.Time `gorm:"type:date"`
-	BasicSalary  float64
-	Bonus        float64
-	TotalA       float64
-	PaidLeave    float64
-	Permission   float64
-	Insurance    float64
-	TotalB       float64
-	Total        float64
-	GenerateDate time.Time `gorm:"type:date"`
+	ID           int       `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name         string    `json:"name"`
+	Position     string    `json:"position"`
+	Status       string    `json:"status"`
+	StartPeriode time.Time `gorm:"type:date" json:"start_periode"`
+	EndPeriode   time.Time `gorm:"type:date" json:"end_periode"`
+	BasicSalary  float64   `json:"basic_salary"`
+	Bonus        float64   `json:"bonus"`
+	TotalA       float64   `json:"total_a"`
+	PaidLeave    float64   `json:"paid_leave"`
+	Permission   float64   `json:"permission"`
+	Insurance    float64   `json:"insurance"`
+	TotalB       float64   `json:"total_b"`
+	Total        float64   `json:"total"`
+	GenerateDate time.Time `gorm:"type:date" json:"generate_date"`
 }
 
 type Project struct {
@@ -99,8 +99,9 @@ type Cis struct {
 
 func (s *SalarySlip) BeforeCreate(tx *gorm.DB) error {
 	s.TotalA = s.BasicSalary + s.Bonus
-	s.TotalB = s.PaidLeave + s.Permission + s.Permission
+	s.TotalB = s.PaidLeave + s.Permission + s.Permission + s.Insurance
 	s.Total = s.TotalA - s.TotalB
+	s.GenerateDate = time.Now()
 	return nil
 }
 
