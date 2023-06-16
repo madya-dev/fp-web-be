@@ -58,3 +58,47 @@ func GetAllEmployeeHandler() gin.HandlerFunc {
 		c.JSON(response.Code, response)
 	}
 }
+
+func GetEmployeeDetail() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		employeeId := c.Param("employee_id")
+		var employee model.Employee
+
+		db := database.Connection()
+		result := db.Preload("EmployeeStatus").
+			Where("id = ?", employeeId).
+			Find(&employee)
+
+		var count int64
+		if result.Count(&count); count == 0 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		type CleanEmployee struct {
+			EmployeeID int     `json:"employee_id"`
+			Name       string  `json:"name"`
+			Age        int     `json:"age"`
+			Salary     float64 `json:"salary"`
+			Position   string  `json:"position"`
+			Status     string  `json:"status"`
+		}
+		cleanEmployee := CleanEmployee{
+			EmployeeID: employee.ID,
+			Name:       employee.Name,
+			Age:        employee.Age,
+			Salary:     employee.Salary,
+			Position:   employee.Position,
+			Status:     employee.EmployeeStatus.Name,
+		}
+
+		response.DefaultOK()
+		response.Message = "success get employee detail"
+		response.Data = map[string]CleanEmployee{
+			"employee": cleanEmployee,
+		}
+		c.JSON(response.Code, response)
+	}
+}

@@ -24,4 +24,5 @@ func CisRoutes(g *gin.RouterGroup) {
 
 func EmployeeRoutes(g *gin.RouterGroup) {
 	g.GET("/", employeeController.GetAllEmployeeHandler())
+	g.GET("/:employee_id", employeeController.GetEmployeeDetail())
 }
