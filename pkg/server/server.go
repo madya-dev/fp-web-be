@@ -9,9 +9,14 @@ import (
 func StartServer() {
 	log.Print("INFO StartServer: server is starting")
 	router := gin.Default()
+	router.MaxMultipartMemory = 2 << 20
+	router.Static("files", "./files")
 
 	account := router.Group("/account")
 	routes.AccountRoutes(account)
+
+	cis := router.Group("/cis")
+	routes.CisRoutes(cis)
 
 	err := router.Run(":8080")
 	if err != nil {

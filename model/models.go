@@ -61,7 +61,7 @@ type CisDetail struct {
 	ID        int       `gorm:"primaryKey;autoIncrement"`
 	StartDate time.Time `gorm:"type:date"`
 	EndDate   time.Time `gorm:"type:date"`
-	File      []byte
+	File      string
 }
 
 type Employee struct {
@@ -90,7 +90,7 @@ type Cis struct {
 	CisTypeID   int
 	CisType     CisType
 	CisStatusID int
-	CisStatus   CisStatus
+	CisStatus   CisStatus `gorm:"default:null"`
 	CisDetailID int
 	CisDetail   CisDetail
 	EmployeeID  int

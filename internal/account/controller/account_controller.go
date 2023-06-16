@@ -34,7 +34,7 @@ func LoginHandler() gin.HandlerFunc {
 
 		db := database.Connection()
 		var account model.Account
-		db.Select("username, password, role").Where("username = ?", loginInput.Username).Find(&account)
+		db.Select("username, password, role, employee_id").Where("username = ?", loginInput.Username).Find(&account)
 
 		err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(loginInput.Password))
 		if account.Username != loginInput.Username || err != nil {
@@ -53,6 +53,10 @@ func LoginHandler() gin.HandlerFunc {
 		jwtString := jwt.CreateToken(account.Username, account.Role)
 		response.DefaultOK()
 		response.Message = "login success"
+		response.Data = map[string]interface{}{
+			"username":    account.Username,
+			"employee_id": account.EmployeeID,
+		}
 		c.Header("Authorization", jwtString)
 		c.JSON(response.Code, response)
 	}
@@ -171,13 +175,13 @@ func DeleteAccountHandler() gin.HandlerFunc {
 		}
 
 		err := db.Transaction(func(tx *gorm.DB) error {
-			if err := db.Where("username = ? AND employee_id = ?", username, account.EmployeeID).
+			if err := tx.Where("username = ? AND employee_id = ?", username, account.EmployeeID).
 				Delete(&model.Account{}).
 				Error; err != nil {
 				return err
 			}
 
-			if err := db.Where("id = ?", account.EmployeeID).
+			if err := tx.Where("id = ?", account.EmployeeID).
 				Delete(&model.Employee{}).
 				Error; err != nil {
 				return err
