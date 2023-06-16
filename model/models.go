@@ -40,6 +40,7 @@ type Project struct {
 	StartDate time.Time `gorm:"type:date"`
 	EndDate   time.Time `gorm:"type:date"`
 	Longtime  int
+	Employees []Employee `gorm:"many2many:project_employees"`
 }
 
 type EmployeeStatus struct {
@@ -72,7 +73,6 @@ type Employee struct {
 	Position         string
 	EmployeeStatusID int
 	EmployeeStatus   EmployeeStatus
-	Projects         []Project `gorm:"many2many:employee_projects"`
 }
 
 type Account struct {
