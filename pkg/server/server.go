@@ -18,6 +18,9 @@ func StartServer() {
 	cis := router.Group("/cis")
 	routes.CisRoutes(cis)
 
+	employee := router.Group("/employee")
+	routes.EmployeeRoutes(employee)
+
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatalf("ERROR StartServer fatal error: %v", err)

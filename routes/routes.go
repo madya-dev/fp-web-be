@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	accountController "hrd-be/internal/account/controller"
 	cisController "hrd-be/internal/cis/controller"
+	employeeController "hrd-be/internal/employee/controller"
 )
 
 func AccountRoutes(g *gin.RouterGroup) {
@@ -19,4 +20,8 @@ func CisRoutes(g *gin.RouterGroup) {
 	g.GET("/:cis_id", cisController.CisDetailHandler())
 	g.PUT("/:cis_id", cisController.EditCisHandler())
 	g.DELETE("/:cis_id", cisController.DeleteCisHandler())
+}
+
+func EmployeeRoutes(g *gin.RouterGroup) {
+	g.GET("/", employeeController.GetAllEmployeeHandler())
 }
