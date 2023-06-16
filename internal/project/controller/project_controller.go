@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/internal/project/dto"
 	"hrd-be/model"
@@ -244,6 +245,45 @@ func EditProjectHandler() gin.HandlerFunc {
 
 		response.DefaultOK()
 		response.Message = "project detail updated successfully"
+		c.JSON(response.Code, response)
+	}
+}
+
+func DeleteProjectHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		projectId := c.Param("project_id")
+
+		db := database.Connection()
+		var project model.Project
+		var count int64
+		result := db.Where("id = ?", projectId).First(&project)
+		if result.Count(&count); count != 1 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		err := db.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Model(&project).Association("Employees").Clear(); err != nil {
+				return err
+			}
+
+			if err := tx.Delete(&project).Error; err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			response.DefaultInternalError()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		response.DefaultOK()
+		response.Message = "project deleted successfully"
 		c.JSON(response.Code, response)
 	}
 }

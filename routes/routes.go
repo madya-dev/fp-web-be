@@ -34,4 +34,5 @@ func ProjectRoutes(g *gin.RouterGroup) {
 	g.GET("/", projectController.GetAllProjectHandler())
 	g.GET("/:project_id", projectController.GetProjectDetailHandler())
 	g.PUT("/:project_id", projectController.EditProjectHandler())
+	g.DELETE("/:project_id", projectController.DeleteProjectHandler())
 }
