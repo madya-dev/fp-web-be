@@ -11,6 +11,7 @@ import (
 	"hrd-be/pkg/database"
 	inputValidator "hrd-be/pkg/validator"
 	"math"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -242,4 +243,50 @@ func EditCisHandler() gin.HandlerFunc {
 		c.JSON(response.Code, response)
 	}
 
+}
+
+func DeleteCisHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		cisId := c.Param("cis_id")
+
+		db := database.Connection()
+		var cis model.Cis
+		var count int64
+		result := db.
+			Preload("CisDetail").
+			Where("id = ?", cisId).
+			Find(&cis)
+
+		result.Count(&count)
+		if count != 1 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		err := db.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Where("id = ?", cis.CisDetailID).Delete(&model.CisDetail{}).Error; err != nil {
+				return err
+			}
+			if err := tx.Where("id = ?", cis.ID).Delete(&model.Cis{}).Error; err != nil {
+				return err
+			}
+
+			if err := os.Remove(filepath.Join("files", cis.CisDetail.File)); err != nil {
+				return err
+			}
+
+			return nil
+		})
+		if err != nil {
+			response.DefaultInternalError()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		response.DefaultOK()
+		response.Message = "CIS deleted successfully"
+		c.JSON(response.Code, response)
+	}
 }
