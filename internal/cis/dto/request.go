@@ -9,3 +9,7 @@ type NewInput struct {
 	EndDate    string                `form:"end_date" validate:"required,min=10,max=10"`
 	File       *multipart.FileHeader `form:"file"`
 }
+
+type EditInput struct {
+	CisStatus int `json:"cis_status" validate:"required,oneof=1 2"`
+}

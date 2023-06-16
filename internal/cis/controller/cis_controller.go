@@ -201,3 +201,45 @@ func CisDetailHandler() gin.HandlerFunc {
 		c.JSON(response.Code, response)
 	}
 }
+
+func EditCisHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		cisId := c.Param("cis_id")
+		var editInput dto.EditInput
+		if err := c.BindJSON(&editInput); err != nil {
+			response.DefaultInternalError()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		validationErrors := inputValidator.RequestBodyValidator(editInput)
+		if validationErrors != nil {
+			response.DefaultBadRequest()
+			response.Data = map[string][]string{"errors": validationErrors}
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		db := database.Connection()
+		var count int64
+		db.Where("id = ?", cisId).Find(&model.Cis{}).Count(&count)
+		if count != 1 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		result := db.Model(&model.Cis{}).Where("id = ?", cisId).Update("cis_status_id", editInput.CisStatus)
+		if result.Error != nil {
+			response.DefaultInternalError()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		response.DefaultOK()
+		response.Message = "cis status updated successfully"
+		c.JSON(response.Code, response)
+	}
+
+}

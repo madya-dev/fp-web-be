@@ -17,4 +17,5 @@ func CisRoutes(g *gin.RouterGroup) {
 	g.POST("/new", cisController.NewCisHandler())
 	g.GET("/", cisController.GetAllCisHandler())
 	g.GET("/:cis_id", cisController.CisDetailHandler())
+	g.PUT("/:cis_id", cisController.EditCisHandler())
 }
