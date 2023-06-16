@@ -147,3 +147,57 @@ func GetAllCisHandler() gin.HandlerFunc {
 		c.JSON(response.Code, response)
 	}
 }
+
+func CisDetailHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var response globalResponse.Response
+		cisId := c.Param("cis_id")
+		protocol := "http://"
+		if c.Request.TLS != nil {
+			protocol = "https://"
+		}
+
+		var cis model.Cis
+
+		db := database.Connection()
+		result := db.Preload("CisType").
+			Preload("CisStatus").
+			Preload("CisDetail").
+			Preload("Employee").
+			Where("id = ?", cisId).
+			Find(&cis)
+
+		var count int64
+		if result.Count(&count); count == 0 {
+			response.DefaultNotFound()
+			c.AbortWithStatusJSON(response.Code, response)
+			return
+		}
+
+		type Cis struct {
+			ID        int    `json:"id"`
+			Type      string `json:"type"`
+			Status    string `json:"status"`
+			Name      string `json:"name"`
+			StartDate string `json:"start_date"`
+			EndDate   string `json:"end_date"`
+			File      string `json:"file"`
+		}
+		cleanCis := Cis{
+			ID:        cis.ID,
+			Type:      cis.CisType.Name,
+			Status:    cis.CisStatus.Name,
+			Name:      cis.Employee.Name,
+			StartDate: cis.CisDetail.StartDate.String(),
+			EndDate:   cis.CisDetail.EndDate.String(),
+			File:      protocol + c.Request.Host + "/files/" + cis.CisDetail.File,
+		}
+
+		response.DefaultOK()
+		response.Message = "get cis detail success"
+		response.Data = map[string]interface{}{
+			"cis": cleanCis,
+		}
+		c.JSON(response.Code, response)
+	}
+}
