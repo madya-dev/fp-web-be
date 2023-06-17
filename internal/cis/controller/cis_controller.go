@@ -106,6 +106,7 @@ func NewCisHandler() gin.HandlerFunc {
 func GetAllCisHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var response globalResponse.Response
+		employeeId := c.Query("employee_id")
 
 		currentPage := c.Query("page")
 		currentPageInt, _ := strconv.Atoi(currentPage)
@@ -126,13 +127,18 @@ func GetAllCisHandler() gin.HandlerFunc {
 		var totalData int64
 		var totalPage int
 		db := database.Connection()
-		db.Model(&model.Cis{}).Count(&totalData)
-		totalPage = int(math.Ceil(float64(totalData) / float64(perPage)))
-		db.Preload("CisType").
+		countResult := db.Model(&model.Cis{})
+		result := db.Preload("CisType").
 			Preload("CisStatus").
 			Preload("CisDetail").
-			Preload("Employee").
-			Limit(perPage).Offset(fistData).Find(&cis)
+			Preload("Employee")
+		if employeeId != "" {
+			result.Where("employee_id = ?", employeeId)
+			countResult.Where("employee_id = ?", employeeId)
+		}
+		result.Limit(perPage).Offset(fistData).Find(&cis)
+		countResult.Count(&totalData)
+		totalPage = int(math.Ceil(float64(totalData) / float64(perPage)))
 
 		var cleanCis []Cis
 		for _, each := range cis {

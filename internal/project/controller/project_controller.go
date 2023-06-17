@@ -87,16 +87,19 @@ func GetAllProjectHandler() gin.HandlerFunc {
 		db := database.Connection()
 		var totalData int64
 		var totalPage int
-		db.Model(&model.Project{}).Count(&totalData)
-		totalPage = int(math.Ceil(float64(totalData) / float64(perPage)))
 
 		var projects []model.Project
 		query := db.Preload("Employees")
+		queryTotal := db.Model(&model.Project{})
 		if employeeId != "" {
 			query.Joins("JOIN project_employees ON projects.id = project_employees.project_id").
 				Where("employee_id = ?", employeeId)
+			queryTotal.Joins("JOIN project_employees ON projects.id = project_employees.project_id").
+				Where("employee_id = ?", employeeId)
 		}
 		query.Order("projects.id DESC").Limit(perPage).Offset(firstData).Find(&projects)
+		queryTotal.Count(&totalData)
+		totalPage = int(math.Ceil(float64(totalData) / float64(perPage)))
 
 		var cleanProjects []Project
 		for _, each := range projects {
