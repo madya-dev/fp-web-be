@@ -39,6 +39,7 @@ func LoginHandler() gin.HandlerFunc {
 		err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(loginInput.Password))
 		if account.Username != loginInput.Username || err != nil {
 			response.DefaultNotFound()
+			response.Message = "invalid username or password"
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}

@@ -34,6 +34,13 @@ func (r *Response) DefaultUnauthorized() {
 	r.Data = nil
 }
 
+func (r *Response) DefaultForbidden() {
+	r.Status = false
+	r.Code = 403
+	r.Message = "forbidden access"
+	r.Data = nil
+}
+
 func (r *Response) DefaultNotFound() {
 	r.Status = false
 	r.Code = 404
