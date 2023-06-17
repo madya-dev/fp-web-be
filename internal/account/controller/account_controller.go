@@ -49,7 +49,11 @@ func LoginHandler() gin.HandlerFunc {
 
 		response.DefaultOK()
 		if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(os.Getenv("DEFAULT_PASS"))); err == nil {
-			response.Data = map[string]string{"error": "user still use default password"}
+			response.Data = map[string]interface{}{
+				"error":       "user still use default password",
+				"username":    account.Username,
+				"employee_id": account.EmployeeID,
+			}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
