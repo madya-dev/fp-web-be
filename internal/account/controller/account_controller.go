@@ -44,22 +44,23 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 
+		jwtString := jwt.CreateToken(account.Username, account.Role)
+		c.Header("Authorization", jwtString)
+		c.JSON(response.Code, response)
+
+		response.DefaultOK()
 		if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(os.Getenv("DEFAULT_PASS"))); err == nil {
-			response.DefaultUnauthorized()
 			response.Data = map[string]string{"error": "user still use default password"}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
 
-		jwtString := jwt.CreateToken(account.Username, account.Role)
-		response.DefaultOK()
 		response.Message = "login success"
 		response.Data = map[string]interface{}{
 			"username":    account.Username,
 			"employee_id": account.EmployeeID,
 		}
-		c.Header("Authorization", jwtString)
-		c.JSON(response.Code, response)
+
 	}
 }
 
