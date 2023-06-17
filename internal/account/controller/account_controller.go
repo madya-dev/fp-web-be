@@ -46,7 +46,6 @@ func LoginHandler() gin.HandlerFunc {
 
 		jwtString := jwt.CreateToken(account.Username, account.Role)
 		c.Header("Authorization", jwtString)
-		c.JSON(response.Code, response)
 
 		response.DefaultOK()
 		if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(os.Getenv("DEFAULT_PASS"))); err == nil {
@@ -60,7 +59,7 @@ func LoginHandler() gin.HandlerFunc {
 			"username":    account.Username,
 			"employee_id": account.EmployeeID,
 		}
-
+		c.JSON(response.Code, response)
 	}
 }
 
