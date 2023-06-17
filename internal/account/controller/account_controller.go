@@ -44,25 +44,19 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 
-		jwtString := jwt.CreateToken(account.Username, account.Role)
+		jwtString := jwt.CreateToken(account.EmployeeID, account.Username, account.Role)
 		c.Header("Authorization", jwtString)
 
 		response.DefaultOK()
+		response.Message = "login success"
 		if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(os.Getenv("DEFAULT_PASS"))); err == nil {
 			response.Data = map[string]interface{}{
-				"error":       "user still use default password",
-				"username":    account.Username,
-				"employee_id": account.EmployeeID,
+				"attention": "user still use default password",
 			}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
 
-		response.Message = "login success"
-		response.Data = map[string]interface{}{
-			"username":    account.Username,
-			"employee_id": account.EmployeeID,
-		}
 		c.JSON(response.Code, response)
 	}
 }
@@ -124,8 +118,9 @@ func CreateAccountHandler() gin.HandlerFunc {
 
 func EditPasswordHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.Param("username")
 		var response globalResponse.Response
+		claims := c.MustGet("claims").(*jwt.CustomClaims)
+
 		var editPasswordInput dto.EditPasswordInput
 		if err := c.BindJSON(&editPasswordInput); err != nil {
 			response.DefaultInternalError()
@@ -144,7 +139,7 @@ func EditPasswordHandler() gin.HandlerFunc {
 		db := database.Connection()
 		bcryptPass, _ := bcrypt.GenerateFromPassword([]byte(editPasswordInput.Password), 10)
 		result := db.Model(model.Account{}).
-			Where("username = ? AND email = ?", username, editPasswordInput.Email).
+			Where("username = ? AND email = ?", claims.Username, editPasswordInput.Email).
 			Update("password", string(bcryptPass))
 		if result.RowsAffected == 0 {
 			response.DefaultNotFound()

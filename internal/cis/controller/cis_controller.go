@@ -9,6 +9,7 @@ import (
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/model"
 	"hrd-be/pkg/database"
+	"hrd-be/pkg/jwt"
 	inputValidator "hrd-be/pkg/validator"
 	"math"
 	"os"
@@ -21,6 +22,7 @@ func NewCisHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var response globalResponse.Response
 		var newInput dto.NewInput
+		claims := c.MustGet("claims").(*jwt.CustomClaims)
 		if err := c.Bind(&newInput); err != nil {
 			response.DefaultInternalError()
 			c.AbortWithStatusJSON(response.Code, response)
@@ -81,7 +83,7 @@ func NewCisHandler() gin.HandlerFunc {
 			cis := model.Cis{
 				CisTypeID:   newInput.Type,
 				CisDetailID: cisDetail.ID,
-				EmployeeID:  newInput.EmployeeID,
+				EmployeeID:  claims.ID,
 			}
 			if err := tx.Create(&cis).Error; err != nil {
 				return err
@@ -106,7 +108,7 @@ func NewCisHandler() gin.HandlerFunc {
 func GetAllCisHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var response globalResponse.Response
-		employeeId := c.Query("employee_id")
+		claims := c.MustGet("claims").(*jwt.CustomClaims)
 
 		currentPage := c.Query("page")
 		currentPageInt, _ := strconv.Atoi(currentPage)
@@ -132,9 +134,9 @@ func GetAllCisHandler() gin.HandlerFunc {
 			Preload("CisStatus").
 			Preload("CisDetail").
 			Preload("Employee")
-		if employeeId != "" {
-			result.Where("employee_id = ?", employeeId)
-			countResult.Where("employee_id = ?", employeeId)
+		if claims.Role != 0 {
+			result.Where("employee_id = ?", claims.ID)
+			countResult.Where("employee_id = ?", claims.ID)
 		}
 		result.Limit(perPage).Offset(fistData).Find(&cis)
 		countResult.Count(&totalData)

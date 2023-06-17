@@ -13,7 +13,7 @@ import (
 func AccountRoutes(g *gin.RouterGroup) {
 	g.POST("/login", accountController.LoginHandler())
 	g.POST("/create", jwt.ValidationMiddleware(0), accountController.CreateAccountHandler())
-	g.PUT("/:username", jwt.ValidationMiddleware(1), accountController.EditPasswordHandler())
+	g.PUT("/", jwt.ValidationMiddleware(1), accountController.EditPasswordHandler())
 	g.DELETE("/:username", jwt.ValidationMiddleware(0), accountController.DeleteAccountHandler())
 }
 

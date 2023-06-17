@@ -7,6 +7,7 @@ import (
 	"hrd-be/internal/project/dto"
 	"hrd-be/model"
 	"hrd-be/pkg/database"
+	"hrd-be/pkg/jwt"
 	inputValidator "hrd-be/pkg/validator"
 	"math"
 	"strconv"
@@ -67,7 +68,8 @@ func NewProjectHandler() gin.HandlerFunc {
 func GetAllProjectHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var response globalResponse.Response
-		employeeId := c.Query("employee_id")
+		claims := c.MustGet("claims").(*jwt.CustomClaims)
+
 		currentPage := c.Query("page")
 		currentPageInt, _ := strconv.Atoi(currentPage)
 		if currentPageInt < 1 {
@@ -91,11 +93,11 @@ func GetAllProjectHandler() gin.HandlerFunc {
 		var projects []model.Project
 		query := db.Preload("Employees")
 		queryTotal := db.Model(&model.Project{})
-		if employeeId != "" {
+		if claims.Role > 0 {
 			query.Joins("JOIN project_employees ON projects.id = project_employees.project_id").
-				Where("employee_id = ?", employeeId)
+				Where("employee_id = ?", claims.ID)
 			queryTotal.Joins("JOIN project_employees ON projects.id = project_employees.project_id").
-				Where("employee_id = ?", employeeId)
+				Where("employee_id = ?", claims.ID)
 		}
 		query.Order("projects.id DESC").Limit(perPage).Offset(firstData).Find(&projects)
 		queryTotal.Count(&totalData)

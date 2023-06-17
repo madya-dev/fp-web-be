@@ -13,15 +13,17 @@ import (
 )
 
 type CustomClaims struct {
-	Username string
-	Role     int
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Role     int    `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func CreateToken(username string, role int) string {
+func CreateToken(id int, username string, role int) string {
 	mySigningKey := []byte(os.Getenv("SIGNKEY"))
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &CustomClaims{
+		id,
 		username,
 		role,
 		jwt.RegisteredClaims{
@@ -113,6 +115,7 @@ func ValidationMiddleware(role int) gin.HandlerFunc {
 		}
 
 		c.Header("Authorization", tokenString)
+		c.Set("claims", claims)
 		c.Next()
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"hrd-be/routes"
 	"log"
+	"os"
 	"time"
 )
 
@@ -41,7 +42,7 @@ func StartServer() {
 	slip := router.Group("/slip")
 	routes.SlipRoutes(slip)
 
-	err := router.Run(":8080")
+	err := router.Run(os.Getenv("PORT"))
 	if err != nil {
 		log.Fatalf("ERROR StartServer fatal error: %v", err)
 	}
