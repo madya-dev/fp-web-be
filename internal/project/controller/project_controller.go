@@ -79,11 +79,9 @@ func GetAllProjectHandler() gin.HandlerFunc {
 		firstData := (currentPageInt * perPage) - perPage
 
 		type Project struct {
-			ID        int    `json:"id"`
-			Name      string `json:"name"`
-			Client    string `json:"client"`
-			StartDate string `json:"start_date"`
-			EndDate   string `json:"end_date"`
+			ID     int    `json:"id"`
+			Name   string `json:"name"`
+			Client string `json:"client"`
 		}
 
 		db := database.Connection()
@@ -109,8 +107,6 @@ func GetAllProjectHandler() gin.HandlerFunc {
 			cleanProject.ID = each.ID
 			cleanProject.Name = each.Name
 			cleanProject.Client = each.Client
-			cleanProject.StartDate = each.StartDate.String()
-			cleanProject.EndDate = each.EndDate.String()
 
 			cleanProjects = append(cleanProjects, cleanProject)
 		}
@@ -177,8 +173,8 @@ func GetProjectDetailHandler() gin.HandlerFunc {
 			Name:      project.Name,
 			Client:    project.Client,
 			Budget:    project.Budget,
-			StartDate: project.StartDate.String(),
-			EndDate:   project.EndDate.String(),
+			StartDate: project.StartDate.Format("2006-01-02"),
+			EndDate:   project.EndDate.Format("2006-01-02"),
 			Longtime:  project.Longtime,
 			Assign:    employees,
 		}

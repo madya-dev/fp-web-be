@@ -59,9 +59,9 @@ type CisStatus struct {
 }
 
 type CisDetail struct {
-	ID        int       `gorm:"primaryKey;autoIncrement"`
-	StartDate time.Time `gorm:"type:date"`
-	EndDate   time.Time `gorm:"type:date"`
+	ID        int `gorm:"primaryKey;autoIncrement"`
+	StartDate time.Time
+	EndDate   time.Time
 	File      string
 }
 

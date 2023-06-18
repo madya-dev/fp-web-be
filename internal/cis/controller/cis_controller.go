@@ -61,8 +61,9 @@ func NewCisHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
-		startDate, _ := time.Parse("2006-01-02", newInput.StartDate)
-		endDate, _ := time.Parse("2006-01-02", newInput.EndDate)
+		local, _ := time.LoadLocation("Asia/Makassar")
+		startDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.StartDate, local)
+		endDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.EndDate, local)
 
 		err := db.Transaction(func(tx *gorm.DB) error {
 			if newInput.File != nil {
@@ -201,14 +202,20 @@ func CisDetailHandler() gin.HandlerFunc {
 			EndDate   string `json:"end_date"`
 			File      string `json:"file"`
 		}
+
+		file := ""
+		if cis.CisDetail.File != "" {
+			file = protocol + c.Request.Host + "/files/" + cis.CisDetail.File
+		}
+
 		cleanCis := Cis{
 			ID:        cis.ID,
 			Type:      cis.CisType.Name,
 			Status:    cis.CisStatus.Name,
 			Name:      cis.Employee.Name,
-			StartDate: cis.CisDetail.StartDate.String(),
-			EndDate:   cis.CisDetail.EndDate.String(),
-			File:      protocol + c.Request.Host + "/files/" + cis.CisDetail.File,
+			StartDate: cis.CisDetail.StartDate.Format("2006-01-02T15:04"),
+			EndDate:   cis.CisDetail.EndDate.Format("2006-01-02T15:04"),
+			File:      file,
 		}
 
 		response.DefaultOK()
