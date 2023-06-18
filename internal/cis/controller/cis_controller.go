@@ -61,7 +61,7 @@ func NewCisHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
-		local, _ := time.LoadLocation("Asia/Makassar")
+		local, _ := time.LoadLocation("Local")
 		startDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.StartDate, local)
 		endDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.EndDate, local)
 
