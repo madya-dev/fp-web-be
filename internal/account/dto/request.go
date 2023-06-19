@@ -6,9 +6,14 @@ type LoginInput struct {
 }
 
 type CreateInput struct {
-	Username string `json:"username" validate:"required,max=15"`
-	Email    string `json:"email" validate:"email,required"`
-	Role     int    `json:"role" validate:"required"`
+	Username string  `json:"username" validate:"required,max=15"`
+	Email    string  `json:"email" validate:"email,required"`
+	Role     int     `json:"role" validate:"required"`
+	Name     string  `json:"name" validate:"required"`
+	Age      int     `json:"age" validate:"required"`
+	Salary   float64 `json:"salary" validate:"required"`
+	Position string  `json:"position" validate:"required"`
+	Status   int     `json:"status" validate:"required"`
 }
 
 type EditPasswordInput struct {

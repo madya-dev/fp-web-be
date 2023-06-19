@@ -65,12 +65,13 @@ func GetEmployeeDetail() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var response globalResponse.Response
 		employeeId := c.Param("employee_id")
-		var employee model.Employee
+		var account model.Account
 
 		db := database.Connection()
-		result := db.Preload("EmployeeStatus").
-			Where("id = ?", employeeId).
-			Find(&employee)
+		result := db.Preload("Employee").
+			Preload("EmployeeStatus").
+			Where("employee_id = ?", employeeId).
+			Find(&account)
 
 		var count int64
 		if result.Count(&count); count == 0 {
@@ -86,14 +87,18 @@ func GetEmployeeDetail() gin.HandlerFunc {
 			Salary     float64 `json:"salary"`
 			Position   string  `json:"position"`
 			Status     string  `json:"status"`
+			Username   string  `json:"username"`
+			Role       int     `json:"role"`
 		}
 		cleanEmployee := CleanEmployee{
-			EmployeeID: employee.ID,
-			Name:       employee.Name,
-			Age:        employee.Age,
-			Salary:     employee.Salary,
-			Position:   employee.Position,
-			Status:     employee.EmployeeStatus.Name,
+			EmployeeID: account.EmployeeID,
+			Name:       account.Employee.Name,
+			Age:        account.Employee.Age,
+			Salary:     account.Employee.Salary,
+			Position:   account.Employee.Position,
+			Status:     account.Employee.EmployeeStatus.Name,
+			Username:   account.Username,
+			Role:       account.Role,
 		}
 
 		response.DefaultOK()

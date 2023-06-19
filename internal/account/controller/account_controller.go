@@ -82,7 +82,13 @@ func CreateAccountHandler() gin.HandlerFunc {
 
 		db := database.Connection()
 		err := db.Transaction(func(tx *gorm.DB) error {
-			employee := model.Employee{}
+			employee := model.Employee{
+				Name:             createInput.Name,
+				Age:              createInput.Age,
+				Salary:           createInput.Salary,
+				Position:         createInput.Position,
+				EmployeeStatusID: createInput.Status,
+			}
 			if err := tx.Create(&employee).Error; err != nil {
 				return err
 			}

@@ -16,6 +16,7 @@ func StartServer() {
 	config := cors.Config{
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowAllOrigins:  true,
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS", "PUT", "DELETE"},
 		ExposeHeaders:    []string{"Authorization"},
 		AllowCredentials: true,
