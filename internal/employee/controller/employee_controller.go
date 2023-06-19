@@ -68,8 +68,7 @@ func GetEmployeeDetail() gin.HandlerFunc {
 		var account model.Account
 
 		db := database.Connection()
-		result := db.Preload("Employee").
-			Preload("EmployeeStatus").
+		result := db.Preload("Employee.EmployeeStatus").
 			Where("employee_id = ?", employeeId).
 			Find(&account)
 
