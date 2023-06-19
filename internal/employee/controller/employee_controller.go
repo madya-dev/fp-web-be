@@ -86,7 +86,7 @@ func GetEmployeeDetail() gin.HandlerFunc {
 			Age        int     `json:"age"`
 			Salary     float64 `json:"salary"`
 			Position   string  `json:"position"`
-			Status     string  `json:"status"`
+			Status     int     `json:"status"`
 			Username   string  `json:"username"`
 			Role       int     `json:"role"`
 		}
@@ -96,7 +96,7 @@ func GetEmployeeDetail() gin.HandlerFunc {
 			Age:        account.Employee.Age,
 			Salary:     account.Employee.Salary,
 			Position:   account.Employee.Position,
-			Status:     account.Employee.EmployeeStatus.Name,
+			Status:     account.Employee.EmployeeStatusID,
 			Username:   account.Username,
 			Role:       account.Role,
 		}

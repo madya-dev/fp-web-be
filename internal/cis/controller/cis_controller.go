@@ -179,9 +179,7 @@ func CisDetailHandler() gin.HandlerFunc {
 		var cis model.Cis
 
 		db := database.Connection()
-		result := db.Preload("CisType").
-			Preload("CisStatus").
-			Preload("CisDetail").
+		result := db.Preload("CisDetail").
 			Preload("Employee").
 			Where("id = ?", cisId).
 			Find(&cis)
@@ -195,8 +193,8 @@ func CisDetailHandler() gin.HandlerFunc {
 
 		type Cis struct {
 			ID        int    `json:"id"`
-			Type      string `json:"type"`
-			Status    string `json:"status"`
+			Type      int    `json:"type"`
+			Status    int    `json:"status"`
 			Name      string `json:"name"`
 			StartDate string `json:"start_date"`
 			EndDate   string `json:"end_date"`
@@ -210,8 +208,8 @@ func CisDetailHandler() gin.HandlerFunc {
 
 		cleanCis := Cis{
 			ID:        cis.ID,
-			Type:      cis.CisType.Name,
-			Status:    cis.CisStatus.Name,
+			Type:      cis.CisTypeID,
+			Status:    cis.CisStatusID,
 			Name:      cis.Employee.Name,
 			StartDate: cis.CisDetail.StartDate.Format("2006-01-02T15:04"),
 			EndDate:   cis.CisDetail.EndDate.Format("2006-01-02T15:04"),
