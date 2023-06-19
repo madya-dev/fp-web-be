@@ -21,7 +21,7 @@ type CustomClaims struct {
 
 func CreateToken(id int, username string, role int) string {
 	mySigningKey := []byte(os.Getenv("SIGNKEY"))
-	expirationTime := time.Now().Add(1 * time.Hour)
+	expirationTime := time.Now().Add(8 * time.Hour)
 	claims := &CustomClaims{
 		id,
 		username,
@@ -101,7 +101,7 @@ func ValidationMiddleware(role int) gin.HandlerFunc {
 
 		// creating refresh token
 		if time.Until(claims.ExpiresAt.Time) < 10*time.Minute {
-			expirationTime := time.Now().Add(1 * time.Hour)
+			expirationTime := time.Now().Add(8 * time.Hour)
 			claims.ExpiresAt = jwt.NewNumericDate(expirationTime)
 		}
 
