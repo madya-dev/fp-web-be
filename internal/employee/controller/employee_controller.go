@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"hrd-be/internal/employee/dto"
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/model"
@@ -129,26 +130,40 @@ func EditEmployeeHandler() gin.HandlerFunc {
 			return
 		}
 
-		var employee model.Employee
 		db := database.Connection()
 
 		var count int64
-		if db.Where("id = ?", employeeId).Find(&employee).Count(&count); count != 1 {
+		var account model.Account
+		if db.Where("employee_id = ?", employeeId).Find(&account).Count(&count); count != 1 {
 			response.DefaultNotFound()
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
 
-		employee.Name = editInput.Name
-		employee.Age = editInput.Age
-		employee.Salary = editInput.Salary
-		employee.Position = editInput.Position
-		employee.EmployeeStatusID = editInput.Status
+		result := db.Transaction(func(tx *gorm.DB) error {
+			account.Username = editInput.Username
+			account.Role = editInput.Role
+			if err := tx.Save(&account).Error; err != nil {
+				return err
+			}
 
-		result := db.Save(&employee)
+			var employee model.Employee
+			tx.Where("id = ?", employeeId).Find(&employee)
+			employee.Name = editInput.Name
+			employee.Age = editInput.Age
+			employee.Salary = editInput.Salary
+			employee.Position = editInput.Position
+			employee.EmployeeStatusID = editInput.Status
+			if err := tx.Save(&employee).Error; err != nil {
+				return err
+			}
+
+			return nil
+		})
+
 		if result.Error != nil {
 			response.DefaultInternalError()
-			response.Data = map[string]string{"errors": result.Error.Error()}
+			response.Data = map[string]string{"errors": result.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
