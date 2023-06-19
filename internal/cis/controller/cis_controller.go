@@ -25,6 +25,7 @@ func NewCisHandler() gin.HandlerFunc {
 		claims := c.MustGet("claims").(*jwt.CustomClaims)
 		if err := c.Bind(&newInput); err != nil {
 			response.DefaultInternalError()
+			response.Data = map[string]string{"errors": err.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
