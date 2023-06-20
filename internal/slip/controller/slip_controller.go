@@ -30,6 +30,7 @@ func GenerateSlipHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
 
 		var employee model.Employee
 		db.Preload("EmployeeStatus").Where("id = ?", generateInput.EmployeeID).

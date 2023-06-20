@@ -43,6 +43,7 @@ func NewProjectHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
 		project := model.Project{
 			Name:      newProjectInput.Name,
 			Client:    newProjectInput.Client,
@@ -85,6 +86,7 @@ func GetAllProjectHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
 		var totalData int64
 		var totalPage int
 
@@ -131,6 +133,7 @@ func GetProjectDetailHandler() gin.HandlerFunc {
 
 		var project model.Project
 		db := database.Connection()
+		defer database.Close(db)
 		result := db.Preload("Employees").
 			Where("id = ?", projectId).Find(&project)
 
@@ -211,6 +214,7 @@ func EditProjectHandler() gin.HandlerFunc {
 		endDate, _ := time.Parse("2006-01-02", editProjectInput.EndDate)
 
 		db := database.Connection()
+		defer database.Close(db)
 		var employees []model.Employee
 		for _, each := range editProjectInput.EmployeesID {
 			var employee model.Employee
@@ -256,6 +260,7 @@ func DeleteProjectHandler() gin.HandlerFunc {
 		projectId := c.Param("project_id")
 
 		db := database.Connection()
+		defer database.Close(db)
 		var project model.Project
 		var count int64
 		result := db.Where("id = ?", projectId).First(&project)

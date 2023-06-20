@@ -33,6 +33,8 @@ func LoginHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		var account model.Account
 		db.Select("username, password, role, employee_id").Where("username = ?", loginInput.Username).Find(&account)
 
@@ -81,6 +83,8 @@ func CreateAccountHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		err := db.Transaction(func(tx *gorm.DB) error {
 			employee := model.Employee{
 				Name:             createInput.Name,
@@ -143,6 +147,8 @@ func EditPasswordHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		bcryptPass, _ := bcrypt.GenerateFromPassword([]byte(editPasswordInput.Password), 10)
 		result := db.Model(model.Account{}).
 			Where("username = ? AND email = ?", claims.Username, editPasswordInput.Email).
@@ -168,6 +174,8 @@ func DeleteAccountHandler() gin.HandlerFunc {
 		var response globalResponse.Response
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		var account model.Account
 		var count int64
 		result := db.Select("employee_id").Where("username = ?", username).Find(&account)

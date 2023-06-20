@@ -62,6 +62,8 @@ func NewCisHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		local, _ := time.LoadLocation("Local")
 		startDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.StartDate, local)
 		endDate, _ := time.ParseInLocation("2006-01-02T15:04", newInput.EndDate, local)
@@ -131,6 +133,8 @@ func GetAllCisHandler() gin.HandlerFunc {
 		var totalData int64
 		var totalPage int
 		db := database.Connection()
+		defer database.Close(db)
+
 		countResult := db.Model(&model.Cis{})
 		result := db.Preload("CisType").
 			Preload("CisStatus").
@@ -178,8 +182,9 @@ func CisDetailHandler() gin.HandlerFunc {
 		}
 
 		var cis model.Cis
-
 		db := database.Connection()
+		defer database.Close(db)
+
 		result := db.Preload("CisDetail").
 			Preload("Employee").
 			Where("id = ?", cisId).
@@ -246,6 +251,8 @@ func EditCisHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		var count int64
 		db.Where("id = ?", cisId).Find(&model.Cis{}).Count(&count)
 		if count != 1 {
@@ -274,6 +281,8 @@ func DeleteCisHandler() gin.HandlerFunc {
 		cisId := c.Param("cis_id")
 
 		db := database.Connection()
+		defer database.Close(db)
+
 		var cis model.Cis
 		var count int64
 		result := db.
