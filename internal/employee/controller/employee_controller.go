@@ -133,14 +133,15 @@ func EditEmployeeHandler() gin.HandlerFunc {
 		db := database.Connection()
 
 		var count int64
-		var account model.Account
-		if db.Where("employee_id = ?", employeeId).Find(&account).Count(&count); count != 1 {
+		if db.Where("employee_id = ?", employeeId).First(&model.Account{}).Count(&count); count != 1 {
 			response.DefaultNotFound()
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
 
-		result := db.Transaction(func(tx *gorm.DB) error {
+		err := db.Transaction(func(tx *gorm.DB) error {
+			var account model.Account
+			tx.Where("employee_id = ?", employeeId).First(&account)
 			account.Username = editInput.Username
 			account.Role = editInput.Role
 			if err := tx.Save(&account).Error; err != nil {
@@ -148,7 +149,7 @@ func EditEmployeeHandler() gin.HandlerFunc {
 			}
 
 			var employee model.Employee
-			tx.Where("id = ?", employeeId).Find(&employee)
+			tx.Where("id = ?", employeeId).First(&employee)
 			employee.Name = editInput.Name
 			employee.Age = editInput.Age
 			employee.Salary = editInput.Salary
@@ -161,9 +162,9 @@ func EditEmployeeHandler() gin.HandlerFunc {
 			return nil
 		})
 
-		if result.Error != nil {
+		if err != nil {
 			response.DefaultInternalError()
-			response.Data = map[string]string{"errors": result.Error()}
+			response.Data = map[string]string{"errors": err.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
