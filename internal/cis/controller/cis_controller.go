@@ -86,6 +86,7 @@ func NewCisHandler() gin.HandlerFunc {
 				CisTypeID:   newInput.Type,
 				CisDetailID: cisDetail.ID,
 				EmployeeID:  claims.ID,
+				CisStatusID: 1,
 			}
 			if err := tx.Create(&cis).Error; err != nil {
 				return err
