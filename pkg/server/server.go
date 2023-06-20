@@ -10,6 +10,10 @@ import (
 )
 
 func StartServer() {
+	//f, _ := os.Create("gin.log")
+	//gin.DisableConsoleColor()
+	//gin.DefaultWriter = io.MultiWriter(f)
+
 	log.Print("INFO StartServer: server is starting")
 	router := gin.Default()
 
