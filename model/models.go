@@ -90,7 +90,7 @@ type Cis struct {
 	CisTypeID   int
 	CisType     CisType
 	CisStatusID int
-	CisStatus   CisStatus `gorm:"default:null"`
+	CisStatus   CisStatus `gorm:"default:1"`
 	CisDetailID int
 	CisDetail   CisDetail
 	EmployeeID  int
@@ -120,4 +120,43 @@ func InitialMigrate() {
 		log.Fatalf("ERROR InitalMigrate fatal error: %v", err)
 	}
 	log.Println("INFO InitialMigrate: auto migrate success")
+
+	createDefault(db)
+}
+
+func createDefault(db *gorm.DB) {
+	cisStatuses := []CisStatus{
+		{ID: 1, Name: "Pending"},
+		{ID: 2, Name: "Rejected"},
+		{ID: 3, Name: "Accepted"},
+	}
+
+	cisTypes := []CisType{
+		{ID: 1, Name: "Cuti"},
+		{ID: 2, Name: "Izin"},
+		{ID: 3, Name: "Sakit"},
+	}
+
+	employeeStatuses := []EmployeeStatus{
+		{ID: 1, Name: "Part Time"},
+		{ID: 2, Name: "Full Time"},
+		{ID: 3, Name: "Freelance"},
+	}
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&cisStatuses).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&cisTypes).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&employeeStatuses).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Fatalf("ERROR createDefault fatal error: %v", err)
+	}
 }
