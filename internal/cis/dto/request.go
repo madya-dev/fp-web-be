@@ -10,5 +10,5 @@ type NewInput struct {
 }
 
 type EditInput struct {
-	CisStatus int `json:"cis_status" validate:"required,oneof=1 2"`
+	CisStatus int `json:"cis_status" validate:"required,oneof=1 2 3"`
 }

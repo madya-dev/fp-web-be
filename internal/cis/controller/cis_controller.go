@@ -2,9 +2,6 @@ package controller
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"hrd-be/internal/cis/dto"
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/model"
@@ -16,6 +13,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func NewCisHandler() gin.HandlerFunc {
@@ -88,6 +89,7 @@ func NewCisHandler() gin.HandlerFunc {
 				CisTypeID:   newInput.Type,
 				CisDetailID: cisDetail.ID,
 				EmployeeID:  claims.ID,
+				CisStatusID: 1,
 			}
 			if err := tx.Create(&cis).Error; err != nil {
 				return err
