@@ -280,7 +280,7 @@ func DeleteCisHandler() gin.HandlerFunc {
 		result := db.
 			Preload("CisDetail").
 			Where("id = ?", cisId).
-			Find(&cis)
+			First(&cis)
 
 		result.Count(&count)
 		if count != 1 {
@@ -290,15 +290,16 @@ func DeleteCisHandler() gin.HandlerFunc {
 		}
 
 		err := db.Transaction(func(tx *gorm.DB) error {
-			if err := tx.Where("id = ?", cis.CisDetailID).Delete(&model.CisDetail{}).Error; err != nil {
-				return err
-			}
 			if err := tx.Where("id = ?", cis.ID).Delete(&model.Cis{}).Error; err != nil {
 				return err
 			}
-
-			if err := os.Remove(filepath.Join("files", cis.CisDetail.File)); err != nil {
+			if err := tx.Where("id = ?", cis.CisDetailID).Delete(&model.CisDetail{}).Error; err != nil {
 				return err
+			}
+			if cis.CisDetail.File != "" {
+				if err := os.Remove(filepath.Join("files", cis.CisDetail.File)); err != nil {
+					return err
+				}
 			}
 
 			return nil
