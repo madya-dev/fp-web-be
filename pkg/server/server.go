@@ -29,7 +29,8 @@ func StartServer() {
 	router.Use(cors.New(config))
 
 	router.MaxMultipartMemory = 2 << 20
-	router.Static("files", "./files")
+	router.Static("uploads", "./files/uploads")
+	router.Static("slips", "./files/slips")
 
 	account := router.Group("/account")
 	routes.AccountRoutes(account)

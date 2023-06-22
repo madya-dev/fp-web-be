@@ -42,8 +42,7 @@ func NewCisHandler() gin.HandlerFunc {
 			return
 		}
 
-		filename := ""
-		ext := ""
+		var filename, ext string
 		if newInput.File != nil {
 			filename = uuid.New().String()
 			ext = filepath.Ext(newInput.File.Filename)
@@ -59,6 +58,7 @@ func NewCisHandler() gin.HandlerFunc {
 				response.DefaultBadRequest()
 				response.Data = map[string]string{"errors": "file input type not allowed"}
 				c.AbortWithStatusJSON(response.Code, response)
+				return
 			}
 		}
 
@@ -71,7 +71,7 @@ func NewCisHandler() gin.HandlerFunc {
 
 		err := db.Transaction(func(tx *gorm.DB) error {
 			if newInput.File != nil {
-				if err := c.SaveUploadedFile(newInput.File, filepath.Join("files", filename+ext)); err != nil {
+				if err := c.SaveUploadedFile(newInput.File, filepath.Join("files", "uploads", filename+ext)); err != nil {
 					return errors.New("failed upload file")
 				}
 			}
@@ -211,7 +211,7 @@ func CisDetailHandler() gin.HandlerFunc {
 
 		file := ""
 		if cis.CisDetail.File != "" {
-			file = protocol + c.Request.Host + "/files/" + cis.CisDetail.File
+			file = protocol + c.Request.Host + "/uploads/" + cis.CisDetail.File
 		}
 
 		cleanCis := Cis{
@@ -307,7 +307,7 @@ func DeleteCisHandler() gin.HandlerFunc {
 				return err
 			}
 			if cis.CisDetail.File != "" {
-				if err := os.Remove(filepath.Join("files", cis.CisDetail.File)); err != nil {
+				if err := os.Remove(filepath.Join("files", "uploads", cis.CisDetail.File)); err != nil {
 					return err
 				}
 			}

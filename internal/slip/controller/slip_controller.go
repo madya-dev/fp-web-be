@@ -3,8 +3,10 @@ package controller
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	globalResponse "hrd-be/internal/global/response"
 	"hrd-be/internal/slip/dto"
+	"hrd-be/internal/slip/service"
 	"hrd-be/model"
 	"hrd-be/pkg/database"
 	inputValidator "hrd-be/pkg/validator"
@@ -82,17 +84,36 @@ func GenerateSlipHandler() gin.HandlerFunc {
 		slip.Permission = permission
 		slip.Insurance = insurance
 
-		result := db.Create(&slip)
-		if result.Error != nil {
+		var filename string
+		err := db.Transaction(func(tx *gorm.DB) error {
+			err := tx.Create(&slip).Error
+			if err != nil {
+				return err
+			}
+
+			filename, err = service.GenerateSlip(slip)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err != nil {
 			response.DefaultInternalError()
+			response.Data = map[string]string{"errors": err.Error()}
 			c.AbortWithStatusJSON(response.Code, response)
 			return
 		}
 
+		protocol := "http://"
+		if c.Request.TLS != nil {
+			protocol = "https://"
+		}
+		file := protocol + c.Request.Host + "/slips/" + filename
 		response.DefaultOK()
 		response.Message = "slip generated successfully"
-		response.Data = map[string]model.SalarySlip{
-			"slip": slip,
+		response.Data = map[string]string{
+			"slip": file,
 		}
 		c.JSON(response.Code, response)
 	}
