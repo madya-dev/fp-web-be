@@ -8,6 +8,7 @@ import (
 	"hrd-be/model"
 	"log"
 	"path"
+	"time"
 )
 
 func GenerateSlip(slip model.SalarySlip) (string, error) {
@@ -24,7 +25,8 @@ func GenerateSlip(slip model.SalarySlip) (string, error) {
 	pdf.SetFooterFunc(func() {
 		pdf.SetFont("Arial", "", 8)
 		_, height := pdf.GetPageSize()
-		pdf.Text(10, height-10, slip.GenerateDate.Format("Monday, 02 January 2006 15:04:05"))
+		local, _ := time.LoadLocation("Asia/Makassar")
+		pdf.Text(10, height-10, slip.GenerateDate.In(local).Format("Monday, 02 January 2006 15:04:05"))
 	})
 
 	pdf.AddPage()
