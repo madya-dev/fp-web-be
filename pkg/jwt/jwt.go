@@ -84,6 +84,7 @@ func ValidationMiddleware(role int) gin.HandlerFunc {
 
 		// metadata validation
 		db := database.Connection()
+		defer database.Close(db)
 
 		var account model.Account
 		err = db.Where("username = ?", claims.Username).Find(&account).Error

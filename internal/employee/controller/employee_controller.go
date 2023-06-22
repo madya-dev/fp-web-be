@@ -24,6 +24,7 @@ func GetAllEmployeeHandler() gin.HandlerFunc {
 		firstData := (currentPage * perPage) - perPage
 
 		db := database.Connection()
+		defer database.Close(db)
 
 		var totalData int64
 		db.Model(&model.Account{}).Count(&totalData)
@@ -69,6 +70,7 @@ func GetEmployeeDetail() gin.HandlerFunc {
 		var account model.Account
 
 		db := database.Connection()
+		defer database.Close(db)
 		result := db.Preload("Employee.EmployeeStatus").
 			Where("employee_id = ?", employeeId).
 			Find(&account)
@@ -131,6 +133,7 @@ func EditEmployeeHandler() gin.HandlerFunc {
 		}
 
 		db := database.Connection()
+		defer database.Close(db)
 
 		var count int64
 		if db.Where("employee_id = ?", employeeId).First(&model.Account{}).Count(&count); count != 1 {

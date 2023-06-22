@@ -112,6 +112,7 @@ func (p *Project) BeforeCreate(tx *gorm.DB) error {
 
 func InitialMigrate() {
 	db := database.Connection()
+	defer database.Close(db)
 
 	log.Println("INFO InitialMigrate: auto migrate start")
 	err := db.AutoMigrate(&SalaryCut{}, &SalarySlip{}, &Project{}, &EmployeeStatus{},
