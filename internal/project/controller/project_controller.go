@@ -116,7 +116,7 @@ func GetAllProjectHandler() gin.HandlerFunc {
 		response.DefaultOK()
 		response.Message = "success get projects"
 		response.Data = map[string]interface{}{
-			"cis_list": cleanProjects,
+			"project_list": cleanProjects,
 			"pagination": map[string]int{
 				"current_page": currentPageInt,
 				"total_page":   totalPage,
