@@ -144,31 +144,15 @@ func GetProjectDetailHandler() gin.HandlerFunc {
 			return
 		}
 
-		type Employee struct {
-			ID       int    `json:"id"`
-			Name     string `json:"name"`
-			Position string `json:"position"`
-		}
-
 		type Project struct {
-			ID        int        `json:"id"`
-			Name      string     `json:"name"`
-			Client    string     `json:"client"`
-			Budget    float64    `json:"budget"`
-			StartDate string     `json:"start_date"`
-			EndDate   string     `json:"end_date"`
-			Longtime  int        `json:"longtime"`
-			Assign    []Employee `json:"assign"`
-		}
-
-		var employees []Employee
-		for _, each := range project.Employees {
-			var employee Employee
-			employee.ID = each.ID
-			employee.Name = each.Name
-			employee.Position = each.Position
-
-			employees = append(employees, employee)
+			ID        int     `json:"id"`
+			Name      string  `json:"name"`
+			Client    string  `json:"client"`
+			Budget    float64 `json:"budget"`
+			StartDate string  `json:"start_date"`
+			EndDate   string  `json:"end_date"`
+			Longtime  int     `json:"longtime"`
+			Assign    []int   `json:"assign"`
 		}
 
 		cleanProject := Project{
@@ -179,7 +163,10 @@ func GetProjectDetailHandler() gin.HandlerFunc {
 			StartDate: project.StartDate.Format("2006-01-02"),
 			EndDate:   project.EndDate.Format("2006-01-02"),
 			Longtime:  project.Longtime,
-			Assign:    employees,
+		}
+
+		for _, each := range project.Employees {
+			cleanProject.Assign = append(cleanProject.Assign, each.ID)
 		}
 
 		response.DefaultOK()
